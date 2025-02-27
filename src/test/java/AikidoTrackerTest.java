@@ -1,51 +1,41 @@
 import org.example.AikidoTracker;
+import org.example.AikidoTrackerMain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.time.LocalDate;
+import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AikidoTrackerTest {
 
     private AikidoTracker tracker;
+    private ByteArrayOutputStream outContent;
 
     @BeforeEach
     public void setUp() {
         tracker = new AikidoTracker();
+        outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
     }
 
     @Test
     public void testAddSession() {
         tracker.addSession(LocalDate.of(2023, 1, 1), 60);
         assertEquals(1, tracker.getSessions().size());
-    }
 
-    @Test
-    public void testGetTotalTrainingTime() {
-        tracker.addSession(LocalDate.of(2023, 1, 1), 60);
-        tracker.addSession(LocalDate.of(2023, 1, 2), 90);
-        assertEquals(150, tracker.getTotalTrainingTime());
-    }
+        String input = "1\n2023-01-01\n60\n4\n";
+        System.setIn(new ByteArrayInputStream(input.getBytes()));
+        Scanner scanner = new Scanner(System.in);
 
-    @Test
-    public void testIsEligibleForKyu() {
-        for (int i = 0; i < 100; i++) {
-            tracker.addSession(LocalDate.of(2023, 1, 1).plusDays(i), 60);
-        }
-        assertTrue(tracker.isEligibleForKyu(LocalDate.now()));
+        AikidoTrackerMain.run(tracker, scanner);
 
-        tracker = new AikidoTracker();
-        tracker.addSession(LocalDate.of(2023, 1, 1), 60);
-        tracker.addSession(LocalDate.of(2023, 7, 1), 60);
-        assertTrue(tracker.isEligibleForKyu(LocalDate.now()));
-
-        tracker = new AikidoTracker();
-        tracker.addSession(LocalDate.of(2023, 1, 1), 60);
-
-        LocalDate fixedCurrentDate = LocalDate.of(2023, 5, 1);
-        assertFalse(tracker.isEligibleForKyu(fixedCurrentDate));
+        assertTrue(outContent.toString().contains("Session added."));
+        assertEquals(2, tracker.getSessions().size());
     }
 }

@@ -7,7 +7,10 @@ public class AikidoTrackerMain {
     public static void main(String[] args) {
         AikidoTracker tracker = new AikidoTracker();
         Scanner scanner = new Scanner(System.in);
+        run(tracker, scanner);
+    }
 
+    public static void run(AikidoTracker tracker, Scanner scanner) {
         while (true) {
             System.out.println("Aikido Practice Tracker");
             System.out.println("1. Add a training session");
